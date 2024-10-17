@@ -224,10 +224,35 @@ func (d *Decoder) decMapByValue(value reflect.Value) error {
 		if mKey := m.Elem().Type().Key(); key.Type().ConvertibleTo(mKey) {
 			key = key.Convert(mKey)
 		}
-		val := EnsureRawValue(entryValue)
-		if mVal := m.Elem().Type().Elem(); val.Type().ConvertibleTo(mVal) {
-			val = val.Convert(mVal)
+
+		// value
+		var (
+			val    reflect.Value
+			valTyp = m.Elem().Type().Elem()
+		)
+		if entryValue == nil {
+			val = reflect.New(valTyp).Elem()
+		} else {
+			if valTyp.Kind() == reflect.Ptr {
+				val = EnsureRawValue(entryValue)
+
+				valElemType := valTyp.Elem()
+				if val.Type().ConvertibleTo(valElemType) {
+					val = val.Convert(valElemType)
+				}
+
+				pVal := reflect.New(valElemType)
+				pVal.Elem().Set(val)
+				val = pVal
+			} else {
+				val = EnsureRawValue(entryValue)
+			}
+
+			if val.Type().ConvertibleTo(valTyp) {
+				val = val.Convert(valTyp)
+			}
 		}
+
 		m.Elem().SetMapIndex(key, val)
 	}
 

@@ -185,9 +185,14 @@ func TestJavaMap(t *testing.T) {
 }
 
 type Obj struct {
-	Map8  map[int8]int8
-	Map16 map[int16]int16
-	Map32 map[int32]int32
+	Map8    map[int8]int8
+	Map8P   map[int8]*int8
+	Map16   map[int16]int16
+	Map16P  map[int16]*int16
+	Map32   map[int32]int32
+	Map32P  map[int32]*int32
+	MapStr  map[string]string
+	MapStrP map[string]*string
 }
 
 func (Obj) JavaClassName() string {
@@ -203,10 +208,19 @@ func TestMapInObject(t *testing.T) {
 		res interface{}
 	)
 
+	int8Val := int8(0)
+	int16Val := int16(0)
+	int32Val := int32(0)
+	strVal := "string"
 	req = &Obj{
-		Map8:  map[int8]int8{1: 2, 3: 4},
-		Map16: map[int16]int16{1: 2, 3: 4},
-		Map32: map[int32]int32{1: 2, 3: 4},
+		Map8:    map[int8]int8{1: 2, 3: 4},
+		Map8P:   map[int8]*int8{0: &int8Val},
+		Map16:   map[int16]int16{1: 2, 3: 4},
+		Map16P:  map[int16]*int16{0: &int16Val},
+		Map32:   map[int32]int32{1: 2, 3: 4},
+		Map32P:  map[int32]*int32{0: &int32Val},
+		MapStr:  map[string]string{"a": "b", "c": "d"},
+		MapStrP: map[string]*string{"non-nil": &strVal, "nil": nil},
 	}
 
 	e = NewEncoder()
